@@ -1,7 +1,7 @@
 package ru.primvol.diplom.model;
 
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 @Entity
@@ -28,6 +30,7 @@ public class User {
 	@Column(name = "third_name")
 	private String thirdName;
 	
+	@DateTimeFormat(pattern = "dd.MM.yyyy")
 	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
 	
@@ -37,7 +40,7 @@ public class User {
 	@Column(name = "phone")
 	private String phone;
 	
-	@Column(name = "type_of_user")
+	@Column(name = "type_of_user") //0 - гость, 1 - волонтер, 2 - координатор/агент
 	private Integer typeOfUser;
 	
 	@Column(name = "date_of_last")
@@ -58,12 +61,20 @@ public class User {
 		this.firstName = firstName;
 		this.secondName = secondName;
 		this.pass = pass;
-		this.typeOfUser = 1;
+		this.typeOfUser = 0;
 	}
 	
 	public User(String email, String pass) {
 		this.email=email;
 		this.pass=pass;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public long getId() {
+		return id;
 	}
 	
 	public void setFirstName(String firstName) {
@@ -82,11 +93,11 @@ public class User {
 		return secondName;
 	}
 	
-	public void setThirdtName(String thirdName) {
+	public void setThirdName(String thirdName) {
 		this.thirdName = thirdName;
 	}
 	
-	public String getThirdtName() {
+	public String getThirdName() {
 		return thirdName;
 	}
 	
@@ -148,6 +159,14 @@ public class User {
 	
 	public String getPhone() {
 		return phone;
+	}
+	
+	public void setTypeOfUser(Integer typeOfUser) {
+		this.typeOfUser = typeOfUser;
+	}
+	
+	public Integer getTypeOfUser() {
+		return typeOfUser;
 	}
 	
 	

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body style="margin:auto; margin-top:25px; box-sizing: inherit; width:80%;">
+	<header style="text-align:center;">
+		<h1 style="display:inline-block; margin-left: 50px; margin-bottom:0px;"><a href="/"><img src="images/logoBig.png" style="width:8%; display:inline-block; margin-right:10px;"></img></a>
+		ПК МОО Волонтер Приморья</h1>
+	</header>
+	
+	<div class="container" style="position:inherit; margin-top:25px;">
+		<nav class="navbar navbar-expand-sm navbar-light border border-danger rounded" style="background-color: #fbbfc5; margin-bottom:25px;">
+
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/news"><h3>Новости</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/events"><h3>Мероприятия</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/about"><h3>О нас</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/contacts"><h3>Контакты</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/faq"><h3>F.A.Q.</h3></a>
+				</li>
+			</ul>	
+			
+			<ul th:if="${activeUser.typeOfUser} == '0'" class="navbar-nav border-left border-danger  nav-item navbar-right">
+      			<li><a class="nav-link" href="/registration"><h4>Регистрация</h4></a></li>
+      			<li><a class="nav-link" href="#"><h4>Вход</h4></a></li>
+    		</ul>			
+			
+		</nav>
+		
+		<div class="container">
+			<h2 th:text="${event.nameOfEvent}" style="display:inline-block; margin-right:10px;"></h2>
+			<a th:if="${activeUser.typeOfUser} == '2'" href="'/editEvent?id=' + ${event.id}" style="display:inline-block;"><h5>Редактировать мероприятие</h5></a>
+		</div>
+		<div class="row border border-info" style="background-color: #d6e7f9; margin-top:10px; padding-top:10px; padding-bottom:10px;">
+				<div class="col-sm-3">
+					<img src="images/1.jpg" class="img-responsive img-box img-thumbnail"> 
+				</div>
+				<div class="col-sm-7">
+					<h4><span th:text="${event.place}"></span></h4>
+					<p th:text="${event.description}"></p>
+					<table>
+						<tr th:each="date, dateStat : ${dates}">
+							<td th:text="${#dates.format(date.dateOf, 'dd.MM.yyyy')} + ':'"></td>
+							<td th:text="'c ' + ${date.timeBegin} + '.00 до ' + ${date.timeEnd} + '.00'"></td>
+						</tr>
+					</table>
+				</div>
+		</div>
+		<div class="container">
+			<table>
+				<thead>
+					<tr>
+						<th>Номер</th>
+						<th>Фамилия</th>
+						<th>Имя</th>
+						<th>Дата рождения</th>
+						<th>Телефон</th>
+						<th>Статус</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="vol, volStat : ${vols}">
+						<td th:text="${volStat.count}"></td>
+						<td th:text="${vol.secondName}"></td>
+						<td th:text="${vol.firstName}"></td>
+						<td th:text="${#dates.format(vol.dateOfBirth, 'dd.MM.yyyy')}"></td>
+						<td th:text="${vol.phone}"></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+						
+		
+		
+	</div>
+</body>
+</html>

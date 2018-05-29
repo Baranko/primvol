@@ -22,9 +22,12 @@ public class Event {
 	private int numberOfVol;
 	
 	@Column(name = "id_coord")
-	private int idCoord;
+	private long idCoord;
 	
-	@Column(name = "status")
+	@Column(name = "place")
+	private String place;
+	
+	@Column(name = "status") //0 - неактивное, 1 - активное, 2 - набор закрыт, 3 - прошло
 	private int status;
 	
 	@Column(name = "description")
@@ -34,23 +37,69 @@ public class Event {
 		
 	}
 	
-	public Event(String nameOfEvent, int numberOfVol, int idCoord, String description) {
+	public Event(String nameOfEvent, int numberOfVol, int idCoord, String place, String description) {
 		this.nameOfEvent = nameOfEvent;
 		this.numberOfVol = numberOfVol;
 		this.idCoord = idCoord;
+		this.place = place;
 		this.description = description;
 		this.status = 1;
 	}
 	
-	public void changeName(String nameOfEvent) {
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public long getId() {
+		return id;
+	}
+	
+	public void setNameOfEvent(String nameOfEvent) {
 		this.nameOfEvent = nameOfEvent;
 	}
 	
-	public void changeNumber(int numberOfVol) {
+	public String getNameOfEvent() {
+		return nameOfEvent;
+	}
+	
+	public void setNumberOfVol(int numberOfVol) {
 		this.numberOfVol = numberOfVol;
 	}
-	public void changeDescription(String description) {
+	
+	public int getNumberOfVol()  {
+		return numberOfVol;
+	}
+	
+	public void setIdCoord(long id) {
+		this.idCoord = id;
+	}
+	
+	public long getIdCoord() {
+		return idCoord;
+	}
+	
+	public void setPlace(String place) {
+		this.place = place;
+	}
+	
+	public String getPlace() {
+		return place;
+	}
+	
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
+	public int getStatus() {
+		return status;
+	}
+	
+	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getDescription() {
+		return description;
 	}
 	
 	@Override
