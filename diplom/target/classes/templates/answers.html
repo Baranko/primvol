@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>Ответы. Волонтер Приморья</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
@@ -61,30 +61,46 @@
 						</tr>
 					</table>
 				</div>
+				<div class="container" style="margin-top:15px;">
+				<form th:action="@{/saveList?id=__${event.id}__}" th:object="${listVol}" method="post">
+					<table class="table table-bordered" style="border:3px solid black;">
+						<thead>
+							<tr>
+								<th style="border:1px solid black;">Номер</th>
+								<th style="border:1px solid black;">Фамилия</th>
+								<th style="border:1px solid black;">Имя</th>
+								<th style="border:1px solid black;">Дата рождения</th>
+								<th style="border:1px solid black;">Телефон</th>
+								<th style="border:1px solid black;">Статус</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="vol, volStat : *{listVol}">
+								<td style="border:1px solid black;" th:text="${volStat.count}"></td>
+								<td style="border:1px solid black;" th:text="${vols[__${volStat.index}__].secondName}"></td>
+								<td style="border:1px solid black;" th:text="${vols[__${volStat.index}__].firstName}"></td>
+								<td style="border:1px solid black;" th:text="${#dates.format(vols[__${volStat.index}__].dateOfBirth, 'dd.MM.yyyy')}"></td>
+								<td style="border:1px solid black;" th:text="${vols[__${volStat.index}__].phone}"></td>
+								<td style="border:1px solid black;">
+									<input type="hidden" th:field="*{listVol[__${volStat.index}__].id}"></input>
+									<input type="hidden" th:field="*{listVol[__${volStat.index}__].idEvent}"></input>
+									<input type="hidden" th:field="*{listVol[__${volStat.index}__].idVol}"></input>
+									<input type="hidden" th:field="*{listVol[__${volStat.index}__].hours}"></input>
+									<select th:field="*{listVol[__${volStat.index}__].status}">
+										<option value="0" disabled>Выберите статус</option>
+										<option value="1" >Не определён</option>
+										<option value="2" >Брать</option>
+										<option value="3" >Не брать</option>
+										<option value="4" >Резерв</option>
+									</select>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<button type="submit" class="btn btn-primary">Сохранить</button>
+					<a class="btn btn-primary" th:href="'/report?id=' + ${event.id}">Создать отчёт</a>
+				</form>
 		</div>
-		<div class="container">
-			<table>
-				<thead>
-					<tr>
-						<th>Номер</th>
-						<th>Фамилия</th>
-						<th>Имя</th>
-						<th>Дата рождения</th>
-						<th>Телефон</th>
-						<th>Статус</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:each="vol, volStat : ${vols}">
-						<td th:text="${volStat.count}"></td>
-						<td th:text="${vol.secondName}"></td>
-						<td th:text="${vol.firstName}"></td>
-						<td th:text="${#dates.format(vol.dateOfBirth, 'dd.MM.yyyy')}"></td>
-						<td th:text="${vol.phone}"></td>
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
 		</div>
 						
 		

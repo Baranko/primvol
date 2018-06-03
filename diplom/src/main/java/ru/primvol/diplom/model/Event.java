@@ -7,6 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import ru.primvol.diplom.repo.ListVolRepository;
+
 @Entity
 @Table(name = "events")
 public class Event {
@@ -27,7 +31,7 @@ public class Event {
 	@Column(name = "place")
 	private String place;
 	
-	@Column(name = "status") //0 - неактивное, 1 - активное, 2 - набор закрыт, 3 - прошло
+	@Column(name = "status") //0 - неактивное, 1 - активное, 2 - набор закрыт и список не сформирован, 3 - набор закрыт и список сформирован, 4 - прошло
 	private int status;
 	
 	@Column(name = "description")
@@ -41,6 +45,13 @@ public class Event {
 		this.nameOfEvent = nameOfEvent;
 		this.numberOfVol = numberOfVol;
 		this.idCoord = idCoord;
+		this.place = place;
+		this.description = description;
+		this.status = 1;
+	}
+	
+	public Event(String nameOfEvent, String place, String description) {
+		this.nameOfEvent = nameOfEvent;
 		this.place = place;
 		this.description = description;
 		this.status = 1;

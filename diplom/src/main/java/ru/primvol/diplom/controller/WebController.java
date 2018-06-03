@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.primvol.diplom.collection.DatesCollection;
 import ru.primvol.diplom.collection.EventsCollection;
+import ru.primvol.diplom.collection.ListVolCollection;
 import ru.primvol.diplom.model.Dates;
 import ru.primvol.diplom.model.Event;
 import ru.primvol.diplom.model.ListVol;
@@ -258,17 +259,57 @@ public class WebController {
 	 		list.add(e);
 	 	}
 	 	List<User> vols = new ArrayList<User>();
+	 	List<ListVol> listVol = new ArrayList<ListVol>();
 	 	for (ListVol e : listVolRepository.findByIdEvent(id)) {
 	 		long idVol = e.getIdVol();
+	 		listVol.add(e);
 	 		User v = userRepository.findById(idVol).get();
 	 		vols.add(v);
 	 	}
-	 	
+	 	ListVolCollection listVolCol = new ListVolCollection();
+	 	listVolCol.setListVol(listVol);
+	 	model.addAttribute("listVol", listVolCol);
 		model.addAttribute("activeUser", this.activeUser);
 		model.addAttribute("dates", list);
 		model.addAttribute("event", event);
 		model.addAttribute("vols", vols);
 		return "answers";
+	}
+	
+	@RequestMapping(value = "/saveList", method = RequestMethod.POST) 
+	public String saveList(@ModelAttribute ListVolCollection listVol, @RequestParam("id") long id, Model model) {
+		for (int i = 0; i<listVol.getListVol().size(); i++) {
+			listVolRepository.save(listVol.getListVol().get(i));
+		}
+		Event event = eventRepository.findById(id).get();
+		List<Dates> list = new ArrayList<Dates>();
+	 	for (Dates e : datesRepository.findByIdEvent(id)) {
+	 		list.add(e);
+	 	}
+	 	List<User> vols = new ArrayList<User>();
+	 	List<ListVol> listVolNew = new ArrayList<ListVol>();
+	 	for (ListVol e : listVolRepository.findByIdEvent(id)) {
+	 		long idVol = e.getIdVol();
+	 		listVolNew.add(e);
+	 		User v = userRepository.findById(idVol).get();
+	 		vols.add(v);
+	 	}
+	 	ListVolCollection listVolCol = new ListVolCollection();
+	 	listVolCol.setListVol(listVolNew);
+	 	model.addAttribute("listVol", listVolCol);
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("dates", list);
+		model.addAttribute("event", event);
+		model.addAttribute("vols", vols);
+		return "answers";
+	}
+	
+	//контроллер отчётов
+	
+	@RequestMapping("/report") 
+	public String report(@RequestParam("id") long id, Model model) {
+		
+		return "report";
 	}
 	
 	

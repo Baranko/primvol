@@ -8,4 +8,6 @@ import ru.primvol.diplom.model.ListVol;
 
 public interface ListVolRepository extends CrudRepository<ListVol, Long> {
 	List<ListVol> findByIdEvent(long idEvent);
+	List<ListVol> findByIdEventAndIdVol(long idEvent, long idVol);
+	List<ListVol> findByIdEventAndStatus(long idEvent, int status);
 }

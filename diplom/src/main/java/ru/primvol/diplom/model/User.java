@@ -2,6 +2,8 @@ package ru.primvol.diplom.model;
 
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,13 +12,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import ru.primvol.diplom.repo.ListVolRepository;
 
 @Entity
 @Table(name = "users")
 public class User {
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
@@ -169,6 +173,16 @@ public class User {
 		return typeOfUser;
 	}
 	
+	public long getStatusFromListVol(long idEvent, List<ListVol> list) {
+		List<ListVol> result = list.stream()
+			    .filter(item -> item.getIdVol() == this.id)
+			    .collect(Collectors.toList());
+		result = result.stream()
+				.filter(item -> item.getIdEvent() == idEvent)
+				.collect(Collectors.toList());
+		long status = result.get(0).getStatus();
+		return status;
+	}
 	
 	@Override
 	public String toString() {

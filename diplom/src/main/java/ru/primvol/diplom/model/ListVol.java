@@ -23,6 +23,9 @@ public class ListVol {
 	@Column(name = "status") //1-обычный, 2 - брать, 3 - не брать, 4 - в резерв
 	private int status;
 	
+	@Column(name = "hours")
+	private int hours;
+	
 	protected ListVol() {
 		
 	}
@@ -63,5 +66,13 @@ public class ListVol {
 	
 	public int getStatus() {
 		return status;
+	}
+	
+	public void setHours(int hours) {
+		this.hours = hours;
+	}
+	
+	public int getHours() {
+		return hours;
 	}
 }
