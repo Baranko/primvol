@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Отчёт. Волонтер Приморья</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body style="margin:auto; margin-top:25px; box-sizing: inherit; width:80%;">
+	<header style="text-align:center;">
+		<h1 style="display:inline-block; margin-left: 50px; margin-bottom:0px;"><a href="/"><img src="images/logoBig.png" style="width:8%; display:inline-block; margin-right:10px;"></img></a>
+		ПК МОО Волонтер Приморья</h1>
+	</header>
+	
+	<div class="container" style="position:inherit; margin-top:25px;">
+		<nav class="navbar navbar-expand-sm navbar-light border border-danger rounded" style="background-color: #fbbfc5; margin-bottom:25px;">
+
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/news"><h3>Новости</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/events"><h3>Мероприятия</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/about"><h3>О нас</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/contacts"><h3>Контакты</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/faq"><h3>F.A.Q.</h3></a>
+				</li>
+			</ul>			
+		</nav>
+		
+		<div class="container">
+			<h2 th:text="${event.nameOfEvent}" style="display:inline-block; margin-right:10px;"></h2>
+			<a th:if="${activeUser.typeOfUser} == '2'" href="'/editEvent?id=' + ${event.id}" style="display:inline-block;"><h5>Редактировать мероприятие</h5></a>
+		</div>
+		<div class="container border border-info" style="background-color: #d6e7f9; margin-top:10px; padding-top:10px; padding-bottom:10px;">
+			<form th:action="@{/createReport?id=__${event.id}__}" th:object="${listVol}" method="post">
+				<table class="table table-bordered" style="border:3px solid black;">
+					<thead>
+						<tr>
+							<th style="border:1px solid black;">Номер</th>
+							<th style="border:1px solid black;">Фамилия</th>
+							<th style="border:1px solid black;">Имя</th>
+							<th style="border:1px solid black;">Часы</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="vol, volStat : *{listVol}">
+							<td style="border:1px solid black;" th:text="${volStat.count}"></td>
+							<td style="border:1px solid black;" th:text="${vols[__${volStat.index}__].secondName}"></td>
+							<td style="border:1px solid black;" th:text="${vols[__${volStat.index}__].firstName}"></td>
+							<td style="border:1px solid black;">
+								<input type="hidden" th:field="*{listVol[__${volStat.index}__].id}"></input>
+								<input type="hidden" th:field="*{listVol[__${volStat.index}__].idEvent}"></input>
+								<input type="hidden" th:field="*{listVol[__${volStat.index}__].idVol}"></input>
+								<input th:field="*{listVol[__${volStat.index}__].hours}"></input>
+								<input type="hidden" th:field="*{listVol[__${volStat.index}__].status}"></input>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<button type="submit" class="btn btn-primary">Сохранить и создать отчёт</button>
+			</form>
+		</div>	
+	</div>
+</body>
+</html>

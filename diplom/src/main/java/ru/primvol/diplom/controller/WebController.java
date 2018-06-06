@@ -1,5 +1,9 @@
 package ru.primvol.diplom.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,6 +11,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.docx4j.jaxb.Context;
+import org.docx4j.model.table.TblFactory;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.wml.BooleanDefaultTrue;
+import org.docx4j.wml.ObjectFactory;
+import org.docx4j.wml.P;
+import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
+import org.docx4j.wml.Tbl;
+import org.docx4j.wml.Tc;
+import org.docx4j.wml.Text;
+import org.docx4j.wml.Tr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -137,9 +155,12 @@ public class WebController {
 	 	for (Dates e : datesRepository.findByIdEvent(id)) {
 	 		list.add(e);
 	 	}
+	 	if (list.size() == 0) {
+	 		Dates newDate = new Dates(id, new Date(), "", "");
+	 		datesRepository.save(newDate);
+		 	list.add(newDate);
+	 	}
 	 	Event event = eventRepository.findById(id).get();
-	 	Dates newDate = new Dates(id, new Date(), "", "");
-	 	list.add(newDate);
 	 	DatesCollection collection = new DatesCollection();
 	 	collection.setDates(list);
 	 	model.addAttribute("event", event);
@@ -148,10 +169,13 @@ public class WebController {
 	}
 	
 	@RequestMapping("/addDate")
-	public String addDate(@ModelAttribute DatesCollection Dates, Model model, @RequestParam("id") long id) {
-		List<Dates> list = Dates.getDates();
+	public String addDate(Model model, @RequestParam("id") long id) {
 		Dates newDate = new Dates(id, new Date(), "", "");
-		list.add(newDate);
+ 		datesRepository.save(newDate);
+		List<Dates> list = new ArrayList<Dates>();
+	 	for (Dates e : datesRepository.findByIdEvent(id)) {
+	 		list.add(e);
+	 	}
 	 	Event event = eventRepository.findById(id).get();
 	 	DatesCollection collection = new DatesCollection();
 	 	collection.setDates(list);
@@ -178,7 +202,7 @@ public class WebController {
 	@RequestMapping(value = "/newDates", method = RequestMethod.POST)
 	public String newDates(@ModelAttribute DatesCollection Dates, Model model) {
 		for (int i = 0; i<Dates.getDates().size(); i++) {
-			System.out.println("yes"+i);
+			datesRepository.save(Dates.getDates().get(i));
 		}
 	 	List<Event> list = new ArrayList<Event>();
 	 	for (Event e : eventRepository.findAll()) {
@@ -308,11 +332,185 @@ public class WebController {
 	
 	@RequestMapping("/report") 
 	public String report(@RequestParam("id") long id, Model model) {
+		List<ListVol> listVol = new ArrayList<ListVol>();
+		List<User> users = new ArrayList<User>();
+		Event event = eventRepository.findById(id).get();
+		for (ListVol e : listVolRepository.findByIdEventAndStatus(id, 2)) {
+			listVol.add(e);
+			users.add(userRepository.findById(e.getIdVol()).get());
+		}
+		ListVolCollection listVolCol = new ListVolCollection();
+		listVolCol.setListVol(listVol);
+		model.addAttribute("listVol", listVolCol);
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("event", event);
+		model.addAttribute("vols", users);	
+		return "report";
 		
+	}
+	@RequestMapping(value = "/createReport", method = RequestMethod.POST) 
+	public String createReport(@RequestParam("id") long id, Model model, @ModelAttribute ListVolCollection listVol) throws Docx4JException {
+		//добавление часов
+		for (int i = 0; i<listVol.getListVol().size(); i++) {
+			listVolRepository.save(listVol.getListVol().get(i));
+		}
+		//создание модели
+		List<ListVol> listVolNew = new ArrayList<ListVol>();
+		List<User> users = new ArrayList<User>();
+		Event event = eventRepository.findById(id).get();
+		for (ListVol e : listVolRepository.findByIdEventAndStatus(id, 2)) {
+			listVolNew.add(e);
+			users.add(userRepository.findById(e.getIdVol()).get());
+		}
+		ListVolCollection listVolCol = new ListVolCollection();
+		listVolCol.setListVol(listVolNew);
+		model.addAttribute("listVol", listVolCol);
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("event", event);
+		model.addAttribute("vols", users);	
+		
+		// создание документа
+		WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
+		MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
+		mainDocumentPart.addStyledParagraphOfText("Title", event.getNameOfEvent());
+		
+		ObjectFactory factory = Context.getWmlObjectFactory();
+		
+		P p = factory.createP(); //абзац
+		
+		//строка даты жирная
+		R dateOf = factory.createR();
+		Text dateText = factory.createText();
+		dateText.setValue("Дата(ы) работы: ");
+		dateText.setSpace("preserve");
+		dateOf.getContent().add(dateText);
+		p.getContent().add(dateOf);
+		RPr rpr = factory.createRPr();       
+		BooleanDefaultTrue b = new BooleanDefaultTrue();
+		rpr.setB(b);
+		dateOf.setRPr(rpr);
+		// строка даты продолжение
+		R dateOfNext = factory.createR();
+		Text dateTextNext = factory.createText();
+		
+		String stringDates = " ";
+		for (Dates e : datesRepository.findByIdEvent(id)) {
+			DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+			stringDates +=  df.format(e.getDateOf()) + ", ";
+		}
+		
+		dateTextNext.setValue(stringDates);
+		dateOfNext.getContent().add(dateTextNext);
+		p.getContent().add(dateOfNext);
+		mainDocumentPart.getContent().add(p);
+		//строка координатора жирная
+		P p2 = factory.createP();
+		R coord = factory.createR();
+		Text coordText = factory.createText();
+		coordText.setValue("Координатор: ");
+		coordText.setSpace("preserve");
+		coord.getContent().add(coordText);
+		p2.getContent().add(coord);
+		rpr.setB(b);
+		coord.setRPr(rpr);
+		//строка координатора продолжение
+		R coordNext = factory.createR();
+		Text coordTextNext = factory.createText();
+		String stringCoord = " ";
+		User coordUser = new User("", "");
+		coordUser = userRepository.findById(event.getIdCoord()).get();
+		stringCoord += coordUser.getSecondName() + " " + coordUser.getFirstName() + " " + coordUser.getThirdName();
+		coordTextNext.setValue(stringCoord);
+		coordNext.getContent().add(coordTextNext);
+		p2.getContent().add(coordNext);
+		mainDocumentPart.getContent().add(p2);
+		
+		//строка количества жирная
+		P p3 = factory.createP();
+		R number = factory.createR();
+		Text numberText = factory.createText();
+		numberText.setValue("Количество волонтёров: ");
+		numberText.setSpace("preserve");
+		number.getContent().add(numberText);
+		p3.getContent().add(number);
+		rpr.setB(b);
+		number.setRPr(rpr);
+		// строка количества продолжение
+		R numberNext = factory.createR();
+		Text numberTextNext = factory.createText();
+		String stringNumber = Integer.toString(event.getNumberOfVol());
+		numberTextNext.setValue(stringNumber);
+		numberNext.getContent().add(numberTextNext);
+		p3.getContent().add(numberNext);
+		mainDocumentPart.getContent().add(p3);
+		
+		
+		int writableWidthTwips = wordPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();
+		int columnNumber = 5;
+		Tbl tbl = TblFactory.createTable(listVolNew.size()+1, 5, writableWidthTwips/columnNumber);     
+		List<Object> rows = tbl.getContent();
+		int k = 0; //строки
+		for (Object row : rows) {
+			int i = 0; //колонки
+		    Tr tr = (Tr) row;
+		    List<Object> cells = tr.getContent();
+			for(Object cell : cells) {
+				Tc td = (Tc) cell;
+				String string = "";
+				switch(i) {
+				case 0: if (k==0) {
+					string = "";
+				}
+				else {
+					string = Integer.toString(k);
+				}
+				break;
+				case 1: if (k==0) {
+					string = "ФИО";
+				}
+				else {
+					string = users.get(k-1).getSecondName() + " " + users.get(k-1).getFirstName() + " " + users.get(k-1).getThirdName();
+				}
+				break;
+				case 2: if (k==0) { 
+					string = "Email";
+				}
+				else {
+					string = users.get(k-1).getEmail();
+				}
+				break;
+				case 3: if (k==0) {
+					string = "Телефон";
+				}
+				else {
+					string = users.get(k-1).getPhone();
+				}
+				break;
+				case 4: if (k==0) {
+					string = "Часы";
+				}
+				else {
+					string = Integer.toString(listVolNew.get(k-1).getHours());
+				}
+				break;
+				}
+				Text field = factory.createText();
+				field.setValue(string);
+				P parag = factory.createP();
+				R run = factory.createR();
+				run.getContent().add(field);
+				parag.getContent().add(run);
+				td.getContent().add(parag);
+				i++;
+			}
+			k++;
+		}
+		mainDocumentPart.addObject(tbl);
+		
+		File exportFile = new File("welcome.docx");
+		wordPackage.save(exportFile);
 		return "report";
 	}
-	
-	
 	@RequestMapping("/save")
 	public String process() {
 		

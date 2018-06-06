@@ -61,7 +61,9 @@
 									<tbody>
 										<tr th:each="date, stat : *{Dates}">
 											<td th:text = "${stat.count}" style="border:1px solid black;"></td>
-											<td  style="border:1px solid black;"><input th:field="*{Dates[__${stat.index}__].dateOf}" class="form-control" type="text"></td>
+											<td  style="border:1px solid black;">
+												<input type="hidden" th:field="*{Dates[__${stat.index}__].id}">
+												<input th:field="*{Dates[__${stat.index}__].dateOf}" class="form-control" type="text"></td>
 											<td style="border:1px solid black;"><input th:field="*{Dates[__${stat.index}__].timeBegin}" class="form-control" type="text"></td>
 											<td  style="border:1px solid black;"> <input th:field="*{Dates[__${stat.index}__].timeEnd}" class="form-control" type="text" />
 											<input type="hidden" th:field="*{Dates[__${stat.index}__].idEvent}"></td>
