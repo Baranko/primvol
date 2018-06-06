@@ -37,26 +37,54 @@ public class News {
 		
 	}
 	
-	public News(String nameOfNews, int idAgent, byte[] photoBlob, String textOfNews) {
+	public News(String nameOfNews, int idAgent, String textOfNews) {
 		this.nameOfNews = nameOfNews;
 		this.idAgent = idAgent;
-		this.photoBlob = photoBlob;
 		this.textOfNews = textOfNews;
 	}
 	
-	public void changeName(String nameOfNews) {
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public long getId() {
+		return id;
+	}
+	
+	
+	public void setNameOfNews(String nameOfNews) {
 		this.nameOfNews = nameOfNews;
 	}
 	
-	public void changeIdEvent(int idEvent) {
+	public String getNameOfNews() {
+		return nameOfNews;
+	}
+	
+	public void setIdAgent(int idAgent) {
+		this.idAgent = idAgent;
+	}
+	
+	public int getIdAgent() {
+		return idAgent;
+	}
+	
+	public void setIdEvent(int idEvent) {
 		this.idEvent = idEvent;
+	}
+	
+	public int getIdEvent() {
+		return idEvent;
 	}
 	
 	public void changePhoto(byte[] photoBlob) {
 		this.photoBlob = photoBlob;
 	}
 	
-	public void changeText(String textOfNews) {
+	public void setTextOfNews(String textOfNews) {
 		this.textOfNews = textOfNews;
+	}
+	
+	public String getTextOfNews() {
+		return textOfNews;
 	}
 }

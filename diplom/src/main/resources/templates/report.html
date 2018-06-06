@@ -68,6 +68,7 @@
 					</tbody>
 				</table>
 				<button type="submit" class="btn btn-primary">Сохранить и создать отчёт</button>
+				<a th:if="${test} == '1'" th:href="'/files/report' + ${event.id} + '.docx'">Скачать отчёт</a>
 			</form>
 		</div>	
 	</div>

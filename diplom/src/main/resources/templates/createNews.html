@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Создание новости. Волонтер Приморья</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body style="margin:auto; margin-top:25px; box-sizing: inherit; width:80%;">
+	<header style="text-align:center;">
+		<h1 style="display:inline-block; margin-left: 50px; margin-bottom:0px;"><a href="/"><img src="images/logoBig.png" style="width:8%; display:inline-block; margin-right:10px;"></img></a>
+		ПК МОО Волонтер Приморья</h1>
+	</header>
+	
+	<div class="container" style="position:inherit; margin-top:25px;">
+		<nav class="navbar navbar-expand-sm navbar-light border border-danger rounded" style="background-color: #fbbfc5; margin-bottom:25px;">
+
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/news"><h3>Новости</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/events"><h3>Мероприятия</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/about"><h3>О нас</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/contacts"><h3>Контакты</h3></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/faq"><h3>F.A.Q.</h3></a>
+				</li>
+			</ul>	
+				
+			
+		</nav>
+		<div class="row">
+			<div class="col-sm-8 offset-sm-2">
+				<div class="card border border-danger" style="background-color: #f8d6f9;">
+					<div class="card-heading bg-light"><h5>Введите сведения о новости</h5>
+					</div>
+					<div class="card-body">
+						<form action="#" th:action="@{/createNewsSucc}" th:object="${news}" method="post">
+							<div class="form-group">
+								<label>Заголовок новости *</label>
+								<input class="form-control" type="text" th:field="*{nameOfNews}" data-validation="required">
+								<input class="form-control" type="hidden" th:field="*{idAgent}" th:value="${activeUser.id}">
+								<input class="form-control" type="hidden" th:field="*{id}">
+							</div>
+							
+							<div class="form-group">
+								<label>Код мероприятия *</label>
+								<input class="form-control" type="text" th:field="*{idEvent}" data-validation="required">
+							</div>
+							
+							<div class="form-group">
+								<label>Текс новости *</label>
+								<textarea class="form-control" th:field="*{textOfNews}" rows="3"></textarea>
+							</div>
+							<button type="submit" class="btn btn-danger">Создать</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+</body>
+</html>

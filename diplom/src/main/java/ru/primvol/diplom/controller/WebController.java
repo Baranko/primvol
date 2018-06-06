@@ -39,9 +39,11 @@ import ru.primvol.diplom.collection.ListVolCollection;
 import ru.primvol.diplom.model.Dates;
 import ru.primvol.diplom.model.Event;
 import ru.primvol.diplom.model.ListVol;
+import ru.primvol.diplom.model.News;
 import ru.primvol.diplom.model.User;
 import ru.primvol.diplom.repo.EventRepository;
 import ru.primvol.diplom.repo.ListVolRepository;
+import ru.primvol.diplom.repo.NewsRepository;
 import ru.primvol.diplom.repo.UserRepository;
 import ru.primvol.diplom.repo.DatesRepository;
 
@@ -59,6 +61,9 @@ public class WebController {
 	
 	@Autowired
 	ListVolRepository listVolRepository;
+	
+	@Autowired
+	NewsRepository newsRepository;
 	
 	private User activeUser = new User("", "", "", "");
 	
@@ -341,10 +346,16 @@ public class WebController {
 		}
 		ListVolCollection listVolCol = new ListVolCollection();
 		listVolCol.setListVol(listVol);
+		File exportFile = new File("src\\main\\resources\\static\\files\\report" + Long.toString(event.getId()) + ".docx");
+		int test = 0;
+		if (exportFile.exists()) {
+			test = 1;
+		}
 		model.addAttribute("listVol", listVolCol);
 		model.addAttribute("activeUser", this.activeUser);
 		model.addAttribute("event", event);
 		model.addAttribute("vols", users);	
+		model.addAttribute("test", test);	
 		return "report";
 		
 	}
@@ -507,42 +518,104 @@ public class WebController {
 		}
 		mainDocumentPart.addObject(tbl);
 		
-		File exportFile = new File("welcome.docx");
+		File exportFile = new File("src\\main\\resources\\static\\files\\report" + Long.toString(event.getId()) + ".docx");
 		wordPackage.save(exportFile);
+		int test = 0;
+		if (exportFile.exists()) {
+			test = 1;
+		}
+		model.addAttribute("test", test);
 		return "report";
 	}
-	@RequestMapping("/save")
-	public String process() {
-		
-		
-		return "Done!";
-	}
 	
-	@RequestMapping("/findall")
-	public String findAll() {
-		String result = "";
-		
-		for(User vol : userRepository.findAll()){
-			result += vol.toString() + "<br>";
+	//конец контроллеров отчётов и ответов
+	
+	//контроллеры новостей
+	
+	@RequestMapping("/news")
+	public String news(Model model) {
+		List<News> listNews = new ArrayList<News>();
+		for (News e : newsRepository.findAll()) {
+			String string = e.getTextOfNews();
+			e.setTextOfNews(string.substring(0, 50) + "...");
+			listNews.add(e);
 		}
-		
-		return result;
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("news", listNews);
+		return "news";
 	}
 	
-	@RequestMapping("/findbyid")
-	public String findById(@RequestParam("id") long id){
-		String result = "";
-		result = userRepository.findById(id).toString();
-		return result;
+	@RequestMapping("/showNews")
+	public String showNews(Model model, @RequestParam long id) {
+		News news = new News("", 0, "");
+		news = newsRepository.findById(id).get();
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("news", news);
+		return "showNews";
 	}
 	
-	@RequestMapping("/findbysecondname")
-	public String fetchDataByLastName(Model model){
-		String result = "";
-		
-		result = userRepository.findByEmail("barankotar@gmail.com").get(0).getPass();
-		model.addAttribute("myObject", result);
-		return "403";
+	@RequestMapping("/createNews")
+	public String createNews(Model model) {
+		News news = new News("", 0, "");
+		news.setIdAgent((int) this.activeUser.getId());
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("news", news);
+		return "createNews";
 	}
-
+	
+	@RequestMapping(value = "/createNewsSucc", method = RequestMethod.POST) 
+	public String newNews(Model model, @ModelAttribute News news) {
+		newsRepository.save(news);	
+		List<News> listNews = new ArrayList<News>();
+		for (News e : newsRepository.findAll()) {
+			String string = e.getTextOfNews();
+			e.setTextOfNews(string.substring(0, 50) + "...");
+			listNews.add(e);
+		}
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("news", listNews);
+		return "news";
+	}
+	
+	@RequestMapping("/editNews")
+	public String editNews(Model model, @RequestParam long id) {
+		News news = newsRepository.findById(id).get();
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("news", news);
+		return "editNews";
+	}
+	
+	@RequestMapping(value = "/editNewsSucc", method = RequestMethod.POST) 
+	public String saveNews(Model model, @ModelAttribute News news) {
+		newsRepository.save(news);
+		List<News> listNews = new ArrayList<News>();
+		for (News e : newsRepository.findAll()) {
+			String string = e.getTextOfNews();
+			e.setTextOfNews(string.substring(0, 50) + "...");
+			listNews.add(e);
+		}
+		model.addAttribute("activeUser", this.activeUser);
+		model.addAttribute("news", listNews);
+		return "news";
+	}
+	//конец контроллера новостей
+	
+	//контроллер постоянных страниц
+	@RequestMapping("/about")
+	public String about(Model model) {
+		model.addAttribute("activeUser", this.activeUser);
+		return "about";
+	}
+	
+	@RequestMapping("/contacts")
+	public String contacts(Model model) {
+		model.addAttribute("activeUser", this.activeUser);
+		return "contacts";
+	}
+	
+	@RequestMapping("/faq")
+	public String faq(Model model) {
+		model.addAttribute("activeUser", this.activeUser);
+		return "faq";
+	}
 }
